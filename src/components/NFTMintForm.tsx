@@ -8,11 +8,13 @@ import {
   Typography,
   Stack,
 } from "@mui/material";
+import { uploadToIPFS } from "@/lib/ipfs";
 
 export default function NFTMintForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -20,14 +22,24 @@ export default function NFTMintForm() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({
-      title,
-      description,
-      file,
-    });
-    alert("Mint işlemi başlatılacak! (dummy)");
+    if (!file) {
+      alert("Please upload an image!");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const ipfsUrl = await uploadToIPFS(title, description, file);
+      alert(`NFT Metadata uploaded to IPFS:\n${ipfsUrl}`);
+      console.log("IPFS URL:", ipfsUrl);
+    } catch (error) {
+      console.error("IPFS upload error:", error);
+      alert("Failed to upload to IPFS!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,6 +65,7 @@ export default function NFTMintForm() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
+          size="sm"
           fullWidth
         />
 
@@ -63,13 +76,11 @@ export default function NFTMintForm() {
           required
           multiline
           rows={3}
+          size="sm"
           fullWidth
         />
 
-        <Button
-          variant="outlined"
-          component="label"
-        >
+        <Button variant="outlined" component="label" size="sm">
           Upload Image
           <input type="file" hidden onChange={handleFileChange} />
         </Button>
@@ -83,8 +94,10 @@ export default function NFTMintForm() {
           type="submit"
           variant="contained"
           color="primary"
+          size="sm"
+          disabled={loading}
         >
-          Mint NFT
+          {loading ? "Uploading..." : "Mint NFT"}
         </Button>
       </Stack>
     </Box>
