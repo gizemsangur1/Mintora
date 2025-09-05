@@ -9,6 +9,7 @@ import {
   Stack,
 } from "@mui/material";
 import { uploadToIPFS } from "@/lib/ipfs";
+import { addNFT } from "@/lib/nftStore";
 // import { CONTRACT_ADDRESS } from "@/lib/contract";
 // import { ethers } from "ethers";
 // import MintoraNFT from "@/lib/MintoraNFT.json"; 
@@ -28,6 +29,40 @@ export default function NFTMintForm() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!file) {
+    alert("Please upload an image!");
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const ipfsUrl = await uploadToIPFS(title, description, file);
+
+    addNFT({
+      title,
+      description,
+      image: previewUrl || "",
+      ipfsUrl,
+    });
+
+    alert(`NFT Metadata uploaded to IPFS:\n${ipfsUrl}`);
+    console.log("Simulated Mint - IPFS URL:", ipfsUrl);
+
+    setTitle("");
+    setDescription("");
+    setFile(null);
+    setPreviewUrl(null);
+
+  } catch (error) {
+    console.error("IPFS upload error:", error);
+    alert("Failed to upload to IPFS!");
+  } finally {
+    setLoading(false);
+  }
+};
+
+/*   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) {
       alert("Please upload an image!");
@@ -36,14 +71,14 @@ export default function NFTMintForm() {
 
     setLoading(true);
     try {
-      //  Metadata IPFS'e yükle
+        Metadata IPFS'e yükle
       const ipfsUrl = await uploadToIPFS(title, description, file);
 
-      //  Şimdilik sadece IPFS URL gösterilecek
+        Şimdilik sadece IPFS URL gösterilecek
       alert(`NFT Metadata uploaded to IPFS:\n${ipfsUrl}`);
       console.log("Simulated Mint - IPFS URL:", ipfsUrl);
 
-      /*
+      
        Gerçek Mint Kısmı (Sepolia ETH gelince açacılacak)
       if (typeof window.ethereum !== "undefined") {
         const provider = new ethers.BrowserProvider(window.ethereum);
@@ -56,14 +91,14 @@ export default function NFTMintForm() {
       } else {
         alert("Please install MetaMask!");
       }
-      */
+     
     } catch (error) {
       console.error("IPFS upload error:", error);
       alert("Failed to upload to IPFS!");
     } finally {
       setLoading(false);
     }
-  };
+  }; */
 
   return (
     <Box
