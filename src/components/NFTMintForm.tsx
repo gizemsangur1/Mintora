@@ -9,16 +9,21 @@ import {
   Stack,
 } from "@mui/material";
 import { uploadToIPFS } from "@/lib/ipfs";
+// import { CONTRACT_ADDRESS } from "@/lib/contract";
+// import { ethers } from "ethers";
+// import MintoraNFT from "@/lib/MintoraNFT.json"; 
 
 export default function NFTMintForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
+      setPreviewUrl(URL.createObjectURL(e.target.files[0]));
     }
   };
 
@@ -31,9 +36,27 @@ export default function NFTMintForm() {
 
     setLoading(true);
     try {
+      //  Metadata IPFS'e yükle
       const ipfsUrl = await uploadToIPFS(title, description, file);
+
+      //  Şimdilik sadece IPFS URL gösterilecek
       alert(`NFT Metadata uploaded to IPFS:\n${ipfsUrl}`);
-      console.log("IPFS URL:", ipfsUrl);
+      console.log("Simulated Mint - IPFS URL:", ipfsUrl);
+
+      /*
+       Gerçek Mint Kısmı (Sepolia ETH gelince açacılacak)
+      if (typeof window.ethereum !== "undefined") {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, MintoraNFT.abi, signer);
+
+        const tx = await contract.mintNFT(await signer.getAddress(), ipfsUrl);
+        await tx.wait();
+        alert("NFT minted successfully!");
+      } else {
+        alert("Please install MetaMask!");
+      }
+      */
     } catch (error) {
       console.error("IPFS upload error:", error);
       alert("Failed to upload to IPFS!");
@@ -65,7 +88,6 @@ export default function NFTMintForm() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          size="sm"
           fullWidth
         />
 
@@ -76,28 +98,36 @@ export default function NFTMintForm() {
           required
           multiline
           rows={3}
-          size="sm"
           fullWidth
         />
 
-        <Button variant="outlined" component="label" size="sm">
+        <Button variant="outlined" component="label">
           Upload Image
           <input type="file" hidden onChange={handleFileChange} />
         </Button>
+
         {file && (
           <Typography variant="body2" color="text.secondary">
             Selected: {file.name}
           </Typography>
         )}
 
+        {previewUrl && (
+          <Box
+            component="img"
+            src={previewUrl}
+            alt="Preview"
+            sx={{ width: "100%", borderRadius: 2 }}
+          />
+        )}
+
         <Button
           type="submit"
           variant="contained"
           color="primary"
-          size="sm"
           disabled={loading}
         >
-          {loading ? "Uploading..." : "Mint NFT"}
+          {loading ? "Uploading..." : "Simulate Mint"}
         </Button>
       </Stack>
     </Box>

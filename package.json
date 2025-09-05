@@ -15,12 +15,14 @@
     "@mui/material": "^7.3.2",
     "@rainbow-me/rainbowkit": "^2.2.8",
     "@tanstack/react-query": "^5.86.0",
+    "axios": "^1.11.0",
     "next": "15.5.2",
     "nft.storage": "^7.2.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "viem": "^2.37.3",
-    "wagmi": "^2.16.9"
+    "wagmi": "^2.16.9",
+    "web3.storage": "^4.5.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
