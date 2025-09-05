@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { uploadToIPFS } from "@/lib/ipfs";
 import { addNFT } from "@/lib/nftStore";
+import { useAccount } from "wagmi";
 // import { CONTRACT_ADDRESS } from "@/lib/contract";
 // import { ethers } from "ethers";
 // import MintoraNFT from "@/lib/MintoraNFT.json"; 
@@ -20,6 +21,7 @@ export default function NFTMintForm() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const { address } = useAccount();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -39,12 +41,13 @@ export default function NFTMintForm() {
   try {
     const ipfsUrl = await uploadToIPFS(title, description, file);
 
-    addNFT({
-      title,
-      description,
-      image: previewUrl || "",
-      ipfsUrl,
-    });
+   addNFT({
+  title,
+  description,
+  image: previewUrl || "",
+  ipfsUrl,
+  owner: address || "0x0"
+});
 
     alert(`NFT Metadata uploaded to IPFS:\n${ipfsUrl}`);
     console.log("Simulated Mint - IPFS URL:", ipfsUrl);
