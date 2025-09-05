@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mintora
 
-## Getting Started
+Mintora is a **Web3-powered DApp** that combines an NFT Marketplace with DAO Governance.  
+Currently, the project runs in **simulation mode** (no live blockchain writes yet) but is fully prepared for real deployment once Sepolia ETH is available.  
 
-First, run the development server:
+Built with **Next.js 15, MUI, wagmi, and RainbowKit**.
 
-```bash
+---
+
+## Current Features (Simulation Mode)
+
+- **NFT Mint (Simulation)**
+  - Uploads image + metadata to **Pinata (IPFS)**.
+  - Returns an IPFS URI (`ipfs://...`).
+  - Smart contract mint function is implemented but commented out (to be enabled with Sepolia ETH).
+
+- **Marketplace**
+  - Displays all minted NFTs.
+  - Each card shows title, description, preview image, and a link to metadata.
+
+- **Profile**
+  - Displays only NFTs owned by the connected wallet address.
+  - In simulation mode, ownership is stored locally.
+
+- **DAO Governance (Simulation)**
+  - Users can create new proposals.
+  - Other users can vote **Yes** / **No**.
+  - Voting results are tracked locally.
+
+---
+
+## Installation
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/gizemsangur1/mintora.git
+   cd mintora
+
+2. Install dependencies:
+```
+npm install
+```
+3. Create a .env.local file and add:
+```
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_id
+NEXT_PUBLIC_PINATA_JWT=your_pinata_jwt
+```
+4. Run the development server:
+```
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Future Roadmap (when Sepolia ETH is available)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Enable real smart contract integration:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+MintoraNFT.sol for minting NFTs (mintNFT).
 
-## Learn More
+MintoraDAO.sol for proposals & voting.
 
-To learn more about Next.js, take a look at the following resources:
+Replace local stores with on-chain data (using wagmi contract reads).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Display minted NFTs directly from the blockchain (tokenURI).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Improve DAO with proposal deadlines and quorum logic.
