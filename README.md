@@ -1,5 +1,7 @@
 # Mintora
 
+[Live Preview](https://mintora-one.vercel.app/)
+
 Mintora is a **Web3-powered DApp** that combines an NFT Marketplace with DAO Governance.  
 Currently, the project runs in **simulation mode** (no live blockchain writes yet) but is fully prepared for real deployment once Sepolia ETH is available.  
 
