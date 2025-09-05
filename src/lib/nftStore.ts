@@ -1,4 +1,4 @@
-let nfts: { 
+const nfts: { 
   title: string; 
   description: string; 
   image: string; 

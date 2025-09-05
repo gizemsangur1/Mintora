@@ -1,4 +1,4 @@
-let proposals: {
+const proposals: {
   id: number;
   title: string;
   description: string;
