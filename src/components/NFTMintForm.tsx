@@ -8,12 +8,10 @@ import {
   Typography,
   Stack,
 } from "@mui/material";
-import { uploadToIPFS } from "@/lib/ipfs";
-import { addNFT } from "@/lib/nftStore";
+import { uploadToIPFS } from "@/lib/ipfs"; 
 import { useAccount } from "wagmi";
-// import { CONTRACT_ADDRESS } from "@/lib/contract";
-// import { ethers } from "ethers";
-// import MintoraNFT from "@/lib/MintoraNFT.json"; 
+import { CONTRACT_ADDRESS, CONTRACT_ABI } from "@/lib/contract";
+import { ethers } from "ethers";
 
 export default function NFTMintForm() {
   const [title, setTitle] = useState("");
@@ -31,41 +29,6 @@ export default function NFTMintForm() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!file) {
-    alert("Please upload an image!");
-    return;
-  }
-
-  setLoading(true);
-  try {
-    const ipfsUrl = await uploadToIPFS(title, description, file);
-
-   addNFT({
-  title,
-  description,
-  image: previewUrl || "",
-  ipfsUrl,
-  owner: address || "0x0"
-});
-
-    alert(`NFT Metadata uploaded to IPFS:\n${ipfsUrl}`);
-    console.log("Simulated Mint - IPFS URL:", ipfsUrl);
-
-    setTitle("");
-    setDescription("");
-    setFile(null);
-    setPreviewUrl(null);
-
-  } catch (error) {
-    console.error("IPFS upload error:", error);
-    alert("Failed to upload to IPFS!");
-  } finally {
-    setLoading(false);
-  }
-};
-
-/*   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) {
       alert("Please upload an image!");
@@ -74,34 +37,38 @@ export default function NFTMintForm() {
 
     setLoading(true);
     try {
-        Metadata IPFS'e yükle
-      const ipfsUrl = await uploadToIPFS(title, description, file);
+      const metadataURI = await uploadToIPFS(title, description, file);
 
-        Şimdilik sadece IPFS URL gösterilecek
-      alert(`NFT Metadata uploaded to IPFS:\n${ipfsUrl}`);
-      console.log("Simulated Mint - IPFS URL:", ipfsUrl);
+      console.log("Metadata IPFS URI:", metadataURI);
 
-      
-       Gerçek Mint Kısmı (Sepolia ETH gelince açacılacak)
-      if (typeof window.ethereum !== "undefined") {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, MintoraNFT.abi, signer);
+      if (typeof window !== "undefined" && (window as any).ethereum) {
+        try {
+          const provider = new ethers.BrowserProvider((window as any).ethereum);
+          const signer = await provider.getSigner();
+          const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
-        const tx = await contract.mintNFT(await signer.getAddress(), ipfsUrl);
-        await tx.wait();
-        alert("NFT minted successfully!");
+          const tx = await contract.mintNFT(await signer.getAddress(), metadataURI);
+          await tx.wait();
+          alert(" NFT minted successfully on Sepolia!");
+        } catch (err) {
+          console.warn("Mint skipped (likely no ETH or rejected):", err);
+          alert(`Metadata uploaded to IPFS only (simulation mode).\n${metadataURI}`);
+        }
       } else {
         alert("Please install MetaMask!");
       }
-     
+
+      setTitle("");
+      setDescription("");
+      setFile(null);
+      setPreviewUrl(null);
     } catch (error) {
       console.error("IPFS upload error:", error);
       alert("Failed to upload to IPFS!");
     } finally {
       setLoading(false);
     }
-  }; */
+  };
 
   return (
     <Box
@@ -165,7 +132,7 @@ export default function NFTMintForm() {
           color="primary"
           disabled={loading}
         >
-          {loading ? "Uploading..." : "Simulate Mint"}
+          {loading ? "Processing..." : "Mint NFT"}
         </Button>
       </Stack>
     </Box>
