@@ -2,32 +2,38 @@
 
 [Live Preview](https://mintora-one.vercel.app/)
 
-Mintora is a **Web3-powered DApp** that combines an NFT Marketplace with DAO Governance.  
-Currently, the project runs in **simulation mode** (no live blockchain writes yet) but is fully prepared for real deployment once Sepolia ETH is available.  
-
-Built with **Next.js 15, MUI, wagmi, and RainbowKit**.
+Mintora is a Web3-powered DApp that combines an NFT Marketplace with DAO Governance.
+It is built with Next.js 15, MUI, wagmi, and RainbowKit, and now runs fully on the Sepolia Testnet.
 
 ---
 
-## Current Features (Simulation Mode)
+## Features (On-Chain, Sepolia)
 
-- **NFT Mint (Simulation)**
+- **NFT Mint**
   - Uploads image + metadata to **Pinata (IPFS)**.
-  - Returns an IPFS URI (`ipfs://...`).
-  - Smart contract mint function is implemented but commented out (to be enabled with Sepolia ETH).
+  - Stores metadata.json on IPFS.
+  - Calls the MintoraNFT.sol smart contract to mint NFT on Sepolia.
 
 - **Marketplace**
-  - Displays all minted NFTs.
-  - Each card shows title, description, preview image, and a link to metadata.
+  - Reads totalSupply from smart contract.
+
+  - Fetches each NFT’s metadata from IPFS (tokenURI).
+
+  - Displays NFT title, description, and image.
 
 - **Profile**
-  - Displays only NFTs owned by the connected wallet address.
-  - In simulation mode, ownership is stored locally.
+  - Reads ownerOf from contract.
+
+  - Displays only NFTs owned by the connected wallet.
 
 - **DAO Governance (Simulation)**
-  - Users can create new proposals.
-  - Other users can vote **Yes** / **No**.
-  - Voting results are tracked locally.
+  - MintoraDAO.sol deployed on Sepolia.
+
+  - Users can create proposals (createProposal).
+
+  - Wallet holders can vote Yes/No (vote).
+
+  - Proposal data is read live with getAllProposals.
 
 ---
 
@@ -54,14 +60,10 @@ npm run dev
 
 ## Future Roadmap (when Sepolia ETH is available)
 
-Enable real smart contract integration:
+Add Marketplace Listings (buy/sell NFTs).
 
-MintoraNFT.sol for minting NFTs (mintNFT).
+DAO proposal deadlines + quorum system.
 
-MintoraDAO.sol for proposals & voting.
+ENS integration for wallet addresses.
 
-Replace local stores with on-chain data (using wagmi contract reads).
-
-Display minted NFTs directly from the blockchain (tokenURI).
-
-Improve DAO with proposal deadlines and quorum logic.
+Role-based features (e.g. only NFT holders can create proposals).
