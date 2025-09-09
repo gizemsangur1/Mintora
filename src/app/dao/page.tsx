@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Container,
   Typography,
@@ -12,24 +12,36 @@ import {
   TextField,
   Stack,
 } from "@mui/material";
-import { addProposal, getProposals, vote } from "@/lib/daoStore";
+import { createProposal, fetchProposals, voteProposal } from "@/lib/daoContract";
 
 export default function DAOPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [proposals, setProposals] = useState(getProposals());
+  const [proposals, setProposals] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleAdd = () => {
+  const loadProposals = async () => {
+    setLoading(true);
+    const data = await fetchProposals();
+    setProposals(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadProposals();
+  }, []);
+
+  const handleAdd = async () => {
     if (!title || !description) return;
-    addProposal(title, description);
-    setProposals(getProposals());
+    await createProposal(title, description);
+    await loadProposals();
     setTitle("");
     setDescription("");
   };
 
-  const handleVote = (id: number, support: boolean) => {
-    vote(id, support);
-    setProposals(getProposals());
+  const handleVote = async (id: number, support: boolean) => {
+    await voteProposal(id, support);
+    await loadProposals();
   };
 
   return (
@@ -58,27 +70,32 @@ export default function DAOPage() {
         </Button>
       </Stack>
 
-      <Grid container spacing={3}>
-        {proposals.map((p) => (
-          <Grid size={{xs:12,md:6}}  key={p.id}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6">{p.title}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {p.description}
-                </Typography>
-                <Typography sx={{ mt: 1 }}>
-                   Yes: {p.votesYes} |  No: {p.votesNo}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button onClick={() => handleVote(p.id, true)}>Vote Yes</Button>
-                <Button onClick={() => handleVote(p.id, false)}>Vote No</Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+      {loading ? (
+        <Typography>Loading proposals...</Typography>
+      ) : (
+        <Grid container spacing={3}>
+          {proposals.map((p) => (
+            <Grid size={{xs:12,md:6,}} key={p.id}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">{p.title}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {p.description}
+                  </Typography>
+                  <Typography sx={{ mt: 1 }}>
+                    Yes: {p.votesYes} | No: {p.votesNo}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button onClick={() => handleVote(p.id, true)}>Vote Yes</Button>
+                  <Button onClick={() => handleVote(p.id, false)}>Vote No</Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
+      
     </Container>
   );
 }
